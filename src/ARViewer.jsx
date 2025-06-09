@@ -37,14 +37,13 @@ export default function ARViewer() {
 
     renderer.xr.enabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera();
     const loader = new GLTFLoader();
     let loadedModel = null;
 
-    // Load model
+    // Load GLB model
     loader.load(modelUrl, (gltf) => {
       loadedModel = gltf.scene;
       loadedModel.scale.set(0.5, 0.5, 0.5);
@@ -52,6 +51,7 @@ export default function ARViewer() {
       scene.add(loadedModel);
     });
 
+    // Reticle for placement
     const reticleGeometry = new THREE.RingGeometry(0.1, 0.15, 32).rotateX(-Math.PI / 2);
     const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
@@ -66,6 +66,7 @@ export default function ARViewer() {
 
     renderer.xr.setSession(session);
 
+    // Tap to place
     const controller = renderer.xr.getController(0);
     controller.addEventListener('select', () => {
       if (reticle.visible && loadedModel) {
@@ -105,16 +106,22 @@ export default function ARViewer() {
 
   return (
     <div>
-      {!modelUrl ? (
-        <div style={{ padding: 20 }}>
-          <input type="file" accept=".glb" onChange={handleFileUpload} />
-        </div>
-      ) : xrSupported ? (
-        <button onClick={startAR}>Start AR</button>
-      ) : (
-        <p>Your device does not support WebXR AR.</p>
+      <div style={{ padding: '1rem' }}>
+        <input type="file" accept=".glb" onChange={handleFileUpload} />
+      </div>
+
+      {modelUrl && (
+        xrSupported ? (
+          <button onClick={startAR}>Start AR</button>
+        ) : (
+          <p style={{ color: 'red' }}>❌ WebXR AR not supported on this device/browser.</p>
+        )
       )}
-      <canvas ref={canvasRef} style={{ width: '100vw', height: '100vh', display: 'block' }} />
+
+      <canvas
+        ref={canvasRef}
+        style={{ width: '100vw', height: '100vh', display: 'block' }}
+      />
     </div>
   );
 }
