@@ -103,25 +103,25 @@ export default function ARViewer() {
       hitTestSource.cancel();
     });
   };
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-return (
-  <div>
-    {!isIOS ? (
-      <>
+  return (
+    <div>
+      <div style={{ padding: '1rem' }}>
         <input type="file" accept=".glb" onChange={handleFileUpload} />
-        {modelUrl && xrSupported ? (
+      </div>
+
+      {modelUrl && (
+        xrSupported ? (
           <button onClick={startAR}>Start AR</button>
-        ) : modelUrl && (
-          <p style={{ color: 'red' }}>WebXR AR not supported.</p>
-        )}
-        <canvas ref={canvasRef} />
-      </>
-    ) : (
-      <a rel="ar" href="path/to/converted-model.usdz">
-        <img src="ar-preview.jpg" alt="View in AR" />
-      </a>
-    )}
-  </div>
-);
+        ) : (
+          <p style={{ color: 'red' }}>❌ WebXR AR not supported on this device/browser.</p>
+        )
+      )}
+
+      <canvas
+        ref={canvasRef}
+        style={{ width: '100vw', height: '100vh', display: 'block' }}
+      />
+    </div>
+  );
 }
